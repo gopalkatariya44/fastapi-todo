@@ -1,0 +1,5 @@
+1XX: info res
+2XX: success
+3XX: redirection
+4XX: Client Errors
+5XX: Searver Errors
