@@ -1,85 +1,145 @@
-from enum import Enum
 from typing import Optional
+from uuid import UUID
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request, Form, Header
+from pydantic import BaseModel, Field
+from starlette import status
+from starlette.responses import JSONResponse
 
 app = FastAPI(host="0.0.0.0")
 
-BOOKS = {
-    'book_1': {'title': 'Title One', 'author': 'Author One'},
-    'book_2': {'title': 'Title Two', 'author': 'Author Two'},
-    'book_3': {'title': 'Title Three', 'author': 'Author Three'},
-    'book_4': {'title': 'Title Four', 'author': 'Author Four'},
-    'book_5': {'title': 'Title Five', 'author': 'Author Five'},
-    'book_6': {'title': 'Title Six', 'author': 'Author Six'},
-}
+
+class NegativeNumberException(Exception):
+    def __init__(self, return_books):
+        self.return_books = return_books
 
 
-class DirectionName(str, Enum):
-    north = 'North'
-    south = 'South'
-    east = 'East'
-    west = 'West'
+class Book(BaseModel):
+    id: UUID
+    title: str = Field(min_length=1)
+    author: str = Field(min_length=1, max_length=100)
+    description: Optional[str] = Field(title='Description of the book', min_length=1, max_length=100)
+    rating: int = Field(gt=-1, lt=101)
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'id': '3fa87f64-5717-4562-b3fc-2c963f66afa6',
+                'title': 'AI & ML',
+                'author': 'Gopal',
+                'description': 'this is my first book',
+                'rating': 90
+            }
+        }
+
+
+class BookNoRating(BaseModel):
+    id: UUID
+    title: str = Field(min_length=1)
+    author: str
+    description: Optional[str] = Field(title='Description of the book', min_length=1, max_length=100)
+
+
+BOOKS = []
+
+
+@app.exception_handler(NegativeNumberException)
+async def negative_number_exception_handler(request: Request,
+                                            exception: NegativeNumberException):
+    return JSONResponse(
+        status_code=418,
+        content={
+            'message': f'Hey, why do you want {exception.return_books} '
+                       f'books? You need to read more!'
+        }
+    )
+
+
+@app.post('/books/login')
+async def books_login(username: str = Form(...), password: str = Form(...)):
+    return {'username': username, 'password': password}
+
+
+@app.get('/header')
+async def read_header(random_header: Optional[str] = Header(None)):
+    return {'Random-Header': random_header}
 
 
 @app.get("/")
-async def read_all_books(skip_book: Optional[str] = None):
-    if skip_book:
-        books_copy = BOOKS.copy()
-        del books_copy[skip_book]
-        return books_copy
+async def read_all_books(return_books: Optional[int] = None):
+    if return_books:
+        if return_books < 0:
+            raise NegativeNumberException(return_books=return_books)
+    create_book_no_api()
+    if return_books and len(BOOKS) >= return_books > 0:
+        i = 1
+        new_books = []
+        while i <= return_books:
+            new_books.append(BOOKS[i - 1])
+            i += 1
+        return new_books
     return BOOKS
 
 
-@app.get('/directions/{direction_name}')
-async def get_direction(direction_name: DirectionName):
-    if direction_name == DirectionName.north:
-        return {'Direction': direction_name, 'Sub': 'Up'}
-    if direction_name == DirectionName.south:
-        return {'Direction': direction_name, 'Sub': 'Down'}
-    if direction_name == DirectionName.west:
-        return {'Direction': direction_name, 'Sub': 'Left'}
-    if direction_name == DirectionName.east:
-        return {'Direction': direction_name, 'Sub': 'Right'}
+@app.get('/book/{book_id}')
+async def read_book(book_id: UUID):
+    for b in BOOKS:
+        if b.id == book_id:
+            return b
+    raise raise_book_not_found()
 
 
-@app.get("/book/{book_title}")
-async def read_book(book_title):
-    return BOOKS[book_title]
+@app.get('/book/rating/{book_id}', response_model=BookNoRating)
+async def read_book_no_rating(book_id: UUID):
+    for b in BOOKS:
+        if b.id == book_id:
+            return b
+    raise raise_book_not_found()
 
 
-@app.post('/')
-async def create_book(book_title, book_author):
-    current_book_id = 0
-    if len(BOOKS) > 0:
-        for book in BOOKS:
-            x = int(book.split('_')[-1])
-            if x > current_book_id:
-                current_book_id = x
-    current_book_id += 1
-    BOOKS[f'book_{current_book_id}'] = {'title': book_title, 'author': book_author}
-    return BOOKS[f'book_{current_book_id}']
+@app.put('/{book_id}')
+async def update_book(book_id: UUID, book: Book):
+    c = 0
+    for b in BOOKS:
+        if b.id == book_id:
+            BOOKS[c] = book
+            return book
+        else:
+            c += 1
+    raise raise_book_not_found()
 
 
-@app.put('/{book_name}')
-async def update_book(book_name: str, book_title: str, book_author: str):
-    book_info = {'title': book_title, 'author': book_author}
-    BOOKS[book_name] = book_info
-    return book_info
+@app.delete('/{book_id}')
+async def update_book(book_id: UUID):
+    c = 0
+    for b in BOOKS:
+        if b.id == book_id:
+            del BOOKS[c]
+            return f'{book_id} deleted.'
+        else:
+            c += 1
+    raise raise_book_not_found()
 
 
-@app.delete('/{book_name}')
-async def delete_book(book_name):
-    del BOOKS[book_name]
-    return f'{book_name} deleted.'
+@app.post('/', status_code=status.HTTP_201_CREATED)
+async def create_book(book: Book):
+    BOOKS.append(book)
+    print(BOOKS)
+    return book
 
 
-@app.get('/assignment/')
-async def read_book_by_name(book_name: str):
-    return BOOKS[book_name]
+def create_book_no_api():
+    if len(BOOKS) < 1:
+        for i in range(1, 5):
+            BOOKS.append(
+                Book(id=f'3fa8{i}f64-5717-4562-b3fc-2c963f66afa6',
+                     title=f'Title {i}',
+                     author=f'Author {i}',
+                     description=f"Description {i}",
+                     rating=f'{i}0')
+            )
 
 
-@app.delete('/assignment/')
-async def read_book_by_name(book_name: str):
-    del BOOKS[book_name]
-    return f'{book_name} deleted.'
+def raise_book_not_found():
+    return HTTPException(status_code=404, detail='Book not found.',
+                         headers={'X-Header-Error': 'Nothing to be seen at the UUID'})
