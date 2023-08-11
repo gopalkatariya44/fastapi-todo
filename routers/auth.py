@@ -1,13 +1,11 @@
 import sys
 
-sys.path.append('..')
 
 from fastapi import Depends, HTTPException, APIRouter
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from typing import Optional, Annotated
+from typing import Optional
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -16,6 +14,8 @@ from database import engine, SessionLocal
 from models import Users
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+
+sys.path.append('..')
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"

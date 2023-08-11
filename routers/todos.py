@@ -1,9 +1,6 @@
 import sys
 
-sys.path.append('..')
-
 from typing import Optional
-
 from fastapi import Depends, HTTPException, APIRouter, status
 from pydantic import BaseModel, Field
 
@@ -11,6 +8,8 @@ import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from routers.auth import get_current_user, get_user_exception
+
+sys.path.append('..')
 
 router = APIRouter(
     prefix='/todos',

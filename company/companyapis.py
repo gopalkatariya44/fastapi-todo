@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
+from .dependencies import get_token_header
 
 router = APIRouter(
     prefix='/company',
     tags=['Company'],
+    dependencies=[Depends(get_token_header)],
     responses={status.HTTP_418_IM_A_TEAPOT: {
         'description': 'Internal Use Only.'
     }}
