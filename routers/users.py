@@ -96,7 +96,7 @@ async def delete_user(db: Session = Depends(get_db),
     return 'Delete successful'
 
 
-@router.put('/phone')
+@router.put('/user/phone')
 async def add_phone_number(phone_number: PhoneNumber,
                            db: Session = Depends(get_db),
                            user: dict = Depends(get_current_user)):
