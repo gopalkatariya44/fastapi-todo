@@ -38,6 +38,10 @@ class UserVerification(BaseModel):
     new_password: str
 
 
+class PhoneNumber(BaseModel):
+    phone_number: str
+
+
 @router.get('/')
 async def read_all(db: Session = Depends(get_db)):
     return db.query(models.Users).all()
@@ -91,3 +95,19 @@ async def delete_user(db: Session = Depends(get_db),
 
     return 'Delete successful'
 
+
+@router.put('/phone')
+async def add_phone_number(phone_number: PhoneNumber,
+                           db: Session = Depends(get_db),
+                           user: dict = Depends(get_current_user)):
+    if user is None:
+        raise get_user_exception()
+    user_model = db.query(models.Users).filter(models.Users.id == user.get('id')).first()
+    if user_model is not None:
+        user_model.phone_number = phone_number.phone_number
+        db.add(user_model)
+        db.commit()
+
+        return 'Phone number updated successfully'
+
+    return 'Invalid user or request'

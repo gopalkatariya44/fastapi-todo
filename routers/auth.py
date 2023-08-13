@@ -28,6 +28,7 @@ class CreateUser(BaseModel):
     first_name: str
     last_name: str
     password: str
+    phone_number: Optional[str]
 
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -37,7 +38,7 @@ models.Base.metadata.create_all(bind=engine)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
-    prefix='/auth',
+    prefix='',
     tags=['Auth'],
     responses={
         status.HTTP_401_UNAUTHORIZED: {
@@ -103,6 +104,7 @@ async def create_new_user(create_user: CreateUser, db: Session = Depends(get_db)
     user.first_name = create_user.first_name
     user.last_name = create_user.last_name
     user.hashed_password = get_password_hash(create_user.password)
+    user.phone_number = create_user.phone_number
     user.is_active = True
 
     db.add(user)
