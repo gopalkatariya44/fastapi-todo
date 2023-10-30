@@ -12,6 +12,9 @@
         <div class="card-body">
             <h5 class="card-title">List of your Todos!</h5>
             <p class="card-text">Information regarding stuff that needs to be complete</p>
+            <a href="add-todo" class="btn btn-primary">Add a new Todo!</a>
+            <br>
+            <br>
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -58,8 +61,6 @@
             {% if todos|length == 0 %}
             <p class="card-text">No todos found! Add some.</p>
             {% endif %}
-            <a href="add-todo" class="btn btn-primary">Add a new Todo!</a>
-
         </div>
     </div>
 </div>

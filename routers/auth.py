@@ -161,7 +161,7 @@ async def login_for_access_token(response: Response,
 async def auth_page(request: Request):
     user = await get_current_user(request)
     if user is not None:
-        return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
     return templates.TemplateResponse('user/login.html', {'request': request})
 
 
@@ -170,7 +170,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
     try:
         form = LoginForm(request)
         await form.create_oauth_form()
-        response = RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+        response = RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
         validate_user_cookie = await login_for_access_token(response=response, form_data=form, db=db)
 
         if not validate_user_cookie:
@@ -194,7 +194,7 @@ async def logout(request: Request):
 async def register_page(request: Request):
     user = await get_current_user(request)
     if user is not None:
-        return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
     return templates.TemplateResponse('user/register.html', {'request': request})
 
 

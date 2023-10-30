@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Double
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -26,9 +26,8 @@ class Todos(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(225))
+    amount = Column(Double)
     description = Column(String(225))
-    priority = Column(Integer)
-    complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey('users.id'))
 
     owner = relationship('Users', back_populates='todos')

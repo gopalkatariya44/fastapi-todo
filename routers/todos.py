@@ -16,7 +16,6 @@ from starlette.responses import RedirectResponse
 sys.path.append('..')
 
 router = APIRouter(
-    prefix='/todos',
     tags=['Todos'],
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -96,7 +95,7 @@ async def create_todo_commit(request: Request,
     db.add(todo_model)
     db.commit()
 
-    return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
 
 
 @router.get('/edit-todo/{todo_id}', response_class=HTMLResponse)
@@ -137,7 +136,7 @@ async def edit_todo_commit(request: Request,
     db.add(todo_model)
     db.commit()
 
-    return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
 
 
 @router.get('/delete/{todo_id}', response_class=HTMLResponse)
@@ -154,7 +153,7 @@ async def delete_todo(request: Request, todo_id: int, db: Session = Depends(get_
      .filter(models.Todos.owner_id == 1).delete())
     db.commit()
 
-    return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
 
 
 @router.get('/complete/{todo_id}', response_class=HTMLResponse)
@@ -170,4 +169,4 @@ async def complete_todo(request: Request, todo_id: int, db: Session = Depends(ge
     db.add(todo_model)
     db.commit()
 
-    return RedirectResponse(url='/todos', status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
