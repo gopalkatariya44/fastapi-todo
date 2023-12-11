@@ -7,6 +7,12 @@ git clone https://github.com/gopalkatariya44/fastapi-todo.git
 ```
 flutter pub get
 ```
+
+##### Run app
+```
+flutter run
+```
+
 #### login
 <img src="ss/login.png" height="500">
 
