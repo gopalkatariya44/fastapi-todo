@@ -1,5 +1,12 @@
 # FastApi Full Stack TODO APP
-
+##### Clone this project
+```
+git clone https://github.com/gopalkatariya44/fastapi-todo.git
+```
+##### Adding a package dependency to an app
+```
+flutter pub get
+```
 #### login
 <img src="ss/login.png" height="500">
 
