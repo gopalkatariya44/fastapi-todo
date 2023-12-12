@@ -3,14 +3,16 @@
 ```
 git clone https://github.com/gopalkatariya44/fastapi-todo.git
 ```
-##### Adding a package dependency to an app
+##### Create virtual env
 ```
-flutter pub get
+python -m venv .myenv
+source .myenv/bin/activate
 ```
 
-##### Run app
+##### install requirements & Run app
 ```
-flutter run
+pip install -r requirements.txt
+python main.py
 ```
 
 #### login
